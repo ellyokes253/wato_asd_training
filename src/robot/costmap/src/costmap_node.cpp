@@ -112,7 +112,7 @@ void CostmapNode::publishCostmap(){
   costmap_.costmap_grid.header.frame_id = "robot/chassis/lidar";
 
   costmap_pub_->publish(costmap_.costmap_grid);
-  RCLCPP_INFO(this->get_logger(), "Costmap publishing!");
+  //RCLCPP_INFO(this->get_logger(), "Costmap publishing!");
 }
  
 int main(int argc, char ** argv)
