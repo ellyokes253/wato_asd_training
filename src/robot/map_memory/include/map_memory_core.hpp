@@ -15,8 +15,16 @@ class MapMemoryCore {
     nav_msgs::msg::OccupancyGrid global_map_;
     nav_msgs::msg::OccupancyGrid latest_costmap_;
 
+    void initializeGlobalMap();
+
   private:
     rclcpp::Logger logger_;
+
+    // same settings for costmap
+    double resolution = 0.1;
+    int width = 1000;
+    int height = 1000;
+    
 };
 
 }  

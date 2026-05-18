@@ -8,7 +8,9 @@ MapMemoryNode::MapMemoryNode() : Node("map_memory"), map_memory_(robot::MapMemor
   odom_sub_ = this->create_subscription<nav_msgs::msg::Odometry>("/odom/filtered", 10, std::bind(&MapMemoryNode::odomCallback, this, std::placeholders::_1));
   costmap_sub_ = this->create_subscription<nav_msgs::msg::OccupancyGrid>("/costmap", 10, std::bind(&MapMemoryNode::costmapCallback, this, std::placeholders::_1));
   map_pub_ = this->create_publisher<nav_msgs::msg::OccupancyGrid>("/map", 10);
-  timer_ = this->create_wall_timer(std::chrono::seconds(1), std::bind(&MapMemoryNode::updateMap, this));
+  timer_ = this->create_wall_timer(std::chrono::milliseconds(500), std::bind(&MapMemoryNode::updateMap, this));
+
+  map_memory_.initializeGlobalMap();
 }
 
 void MapMemoryNode::odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg){
@@ -33,11 +35,6 @@ void MapMemoryNode::costmapCallback(const nav_msgs::msg::OccupancyGrid::SharedPt
   map_memory_.latest_costmap_ = *msg;
   costmap_updated_ = true;
 
-  if (map_memory_.global_map_.data.empty()){
-    map_memory_.global_map_.info = map_memory_.latest_costmap_.info;
-    map_memory_.global_map_.data.assign(map_memory_.latest_costmap_.info.width * map_memory_.latest_costmap_.info.height, -1);
-  }
-
 }
 
 void MapMemoryNode::updateMap(){
@@ -45,7 +42,7 @@ void MapMemoryNode::updateMap(){
     integrateCostmap();
 
     map_memory_.global_map_.header.stamp = this->get_clock()->now();
-    map_memory_.global_map_.header.frame_id = map_memory_.latest_costmap_.header.frame_id;
+    map_memory_.global_map_.header.frame_id = "sim_world";
     
     map_pub_->publish(map_memory_.global_map_);
     should_update_map_ = false;
