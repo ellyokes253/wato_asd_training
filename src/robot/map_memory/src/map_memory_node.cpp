@@ -47,6 +47,12 @@ void MapMemoryNode::updateMap(){
     map_pub_->publish(map_memory_.global_map_);
     should_update_map_ = false;
   }
+  else{
+    map_memory_.global_map_.header.stamp = this->get_clock()->now();
+    map_memory_.global_map_.header.frame_id = "sim_world";
+    
+    map_pub_->publish(map_memory_.global_map_); // for the planner node to work properly
+  }
 }
 
 void MapMemoryNode::integrateCostmap(){
